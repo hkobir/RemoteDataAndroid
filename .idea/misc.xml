@@ -5,6 +5,10 @@
       <map>
         <entry key="..\:/Android Development/Projects/ATN/RemoteApiAndroid/app/src/main/res/layout/activity_main.xml" value="0.15" />
         <entry key="..\:/Android Development/Projects/ATN/RemoteApiAndroid/app/src/main/res/layout/item_album_row.xml" value="0.14" />
+        <entry key="..\:/Android Development/Projects/RemoteDataAndroid/app/src/main/res/layout/activity_main.xml" value="0.18032786885245902" />
+        <entry key="..\:/Android Development/Projects/RemoteDataAndroid/app/src/main/res/layout/api_menu_dialog.xml" value="0.20652173913043478" />
+        <entry key="..\:/Android Development/Projects/RemoteDataAndroid/app/src/main/res/layout/fragment_list.xml" value="0.20652173913043478" />
+        <entry key="..\:/Android Development/Projects/RemoteDataAndroid/app/src/main/res/layout/fragment_view.xml" value="0.20652173913043478" />
       </map>
     </option>
   </component>

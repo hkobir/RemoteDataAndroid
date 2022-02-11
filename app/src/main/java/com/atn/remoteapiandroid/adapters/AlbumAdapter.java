@@ -11,7 +11,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.atn.remoteapiandroid.R;
-import com.atn.remoteapiandroid.models.Album;
+import com.atn.remoteapiandroid.models.Photo;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -19,14 +19,14 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> {
-    private List<Album> albumList;
+    private List<Photo> albumList;
     private Context context;
 
     public AlbumAdapter(Context context) {
         this.context = context;
     }
 
-    public void setAlbumList(List<Album> albumList) {
+    public void setAlbumList(List<Photo> albumList) {
         this.albumList = albumList;
 
     }
@@ -60,7 +60,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
             titleTv = itemView.findViewById(R.id.titleTV);
         }
 
-        public void bind(Album album) {
+        public void bind(Photo album) {
             titleTv.setText(album.getTitle());
             Picasso.get().load(album.getUrl()).into(coverIV);
             Picasso.get().load(album.getThumbnailUrl()).into(profileIV);

@@ -1,72 +1,69 @@
 package com.atn.remoteapiandroid;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ProgressBar;
 
-import com.atn.remoteapiandroid.adapters.AlbumAdapter;
-import com.atn.remoteapiandroid.models.Album;
-import com.atn.remoteapiandroid.remote.AlbumInterface;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
-    private List<Album> albumList;
-    private RecyclerView albumRv;
-    private String BASE_URL = "https://jsonplaceholder.typicode.com";
-    private AlbumAdapter albumAdapter;
-    private ProgressBar progressBar;
+    FloatingActionButton floatingActionButton;
+    AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //init
-        albumList = new ArrayList<>();
-        albumRv = findViewById(R.id.albumRV);
-        progressBar = findViewById(R.id.progressView);
-        albumRv.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        albumAdapter = new AlbumAdapter(this);
-        populateAlbumData();
+        floatingActionButton = findViewById(R.id.apiMenu);
+        floatingActionButton.setOnClickListener(v -> loadMenuDialog());
 
+        replaceFragment(new ListFragment()); //default view
     }
 
-    private void populateAlbumData() {
-        progressBar.setVisibility(View.VISIBLE);
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        Call<List<Album>> albumCall = retrofit.create(AlbumInterface.class).getAlbumList();
-        albumCall.enqueue(new Callback<List<Album>>() {
-            @Override
-            public void onResponse(Call<List<Album>> call, Response<List<Album>> response) {
-                if (response.isSuccessful()) {
-                    albumList = response.body();
-                    albumAdapter.setAlbumList(albumList);
-                    albumRv.setAdapter(albumAdapter);
-                    progressBar.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Album>> call, Throwable t) {
-                Log.d("MainActivity", "onFailure: " + t.getMessage());
-            }
+    private void loadMenuDialog() {
+        alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setCancelable(true);
+        View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.api_menu_dialog, null);
+        view.findViewById(R.id.listLayout).setOnClickListener(v -> replaceFragment(new ListFragment()));
+        view.findViewById(R.id.singleDataLV).setOnClickListener(v -> new ViewFragment());
+        view.findViewById(R.id.insertDataLV).setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("result", "insert");
+            ViewFragment fragment = new ViewFragment();
+            fragment.setArguments(bundle);
+            replaceFragment(fragment);
         });
+        view.findViewById(R.id.updateDataLV).setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("result", "update");
+            ViewFragment fragment = new ViewFragment();
+            fragment.setArguments(bundle);
+            replaceFragment(fragment);
+        });
+        view.findViewById(R.id.deleteDataLV).setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("result", "delete");
+            ViewFragment fragment = new ViewFragment();
+            fragment.setArguments(bundle);
+            replaceFragment(fragment);
+        });
+        alertDialog.setCancelable(true);
+        alertDialog.setView(view);
+        alertDialog.show();
 
     }
+
+    public void replaceFragment(Fragment fragment) {
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction ft = manager.beginTransaction();
+        ft.replace(R.id.frame_layout, fragment);
+        ft.commit();
+    }
+
 }
