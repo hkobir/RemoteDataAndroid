@@ -16,7 +16,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.atn.remoteapiandroid.models.Album;
-import com.atn.remoteapiandroid.models.Photo;
 import com.atn.remoteapiandroid.remote.AlbumInterface;
 
 import retrofit2.Call;
@@ -31,7 +30,7 @@ public class ViewFragment extends Fragment {
     private ProgressBar progressBar;
     LinearLayout insertView, idView;
     Retrofit retrofit;
-    private EditText titleEt, urlEt;
+    private EditText userIdEt, titleEt;
     Button submitBtn;
     private TextView userId, dbId, title, tvResult;
     private String BASE_URL = "https://jsonplaceholder.typicode.com";
@@ -94,13 +93,13 @@ public class ViewFragment extends Fragment {
                 if (response.isSuccessful()) {
                     Album album = response.body();
                     if (isUpdate) {
-                        urlEt.setText(album.getTitle());
-                        titleEt.setText(String.valueOf(album.getUserId()));
+                        titleEt.setText(album.getTitle());
+                        userIdEt.setText(String.valueOf(album.getUserId()));
                     } else {
                         tvResult.setText("Code: " + response.code());
-                        userId.setText("User id: "+ album.getUserId());
-                        dbId.setText("Id: "+ album.getId());
-                        title.setText("Title: "+album.getTitle());
+                        userId.setText("User id: " + album.getUserId());
+                        dbId.setText("Id: " + album.getId());
+                        title.setText("Title: " + album.getTitle());
                     }
                     showProgress(false);
                 } else {
@@ -118,17 +117,17 @@ public class ViewFragment extends Fragment {
 
     private void insertAlbumData() {
         showProgress(true);
-        if (titleEt.getText().toString().equals("")) {
-            titleEt.setError("user id required");
+        if (userIdEt.getText().toString().equals("")) {
+            userIdEt.setError("user id required");
             return;
         }
-        if (urlEt.getText().toString().equals("")) {
-            urlEt.setError("title required");
+        if (titleEt.getText().toString().equals("")) {
+            titleEt.setError("title required");
             return;
         }
         Album album = new Album(
-                Integer.parseInt(titleEt.getText().toString()),
-                urlEt.getText().toString()
+                Integer.parseInt(userIdEt.getText().toString()),
+                titleEt.getText().toString()
         );
         Call<Album> albumCall = retrofit.create(AlbumInterface.class).insertAlbum(album);
         albumCall.enqueue(new Callback<Album>() {
@@ -155,17 +154,17 @@ public class ViewFragment extends Fragment {
 
     private void updateAlbumData() {
         showProgress(true);
-        if (titleEt.getText().toString().equals("")) {
-            titleEt.setError("user id required");
+        if (userIdEt.getText().toString().equals("")) {
+            userIdEt.setError("user id required");
             return;
         }
-        if (urlEt.getText().toString().equals("")) {
-            urlEt.setError("title required");
+        if (titleEt.getText().toString().equals("")) {
+            titleEt.setError("title required");
             return;
         }
         Album album = new Album(
-                Integer.parseInt(titleEt.getText().toString()),
-                urlEt.getText().toString()
+                Integer.parseInt(userIdEt.getText().toString()),
+                titleEt.getText().toString()
         );
         Call<Album> albumCall = retrofit.create(AlbumInterface.class).updateAlbum(5, album);
         albumCall.enqueue(new Callback<Album>() {
@@ -223,8 +222,8 @@ public class ViewFragment extends Fragment {
         dbId = view.findViewById(R.id.dbId);
         title = view.findViewById(R.id.titleTview);
         tvResult = view.findViewById(R.id.textViewResult);
-        titleEt = view.findViewById(R.id.titleEt);
-        urlEt = view.findViewById(R.id.urlEt);
+        userIdEt = view.findViewById(R.id.titleEt);
+        titleEt = view.findViewById(R.id.urlEt);
         submitBtn = view.findViewById(R.id.submitBtn);
 
         retrofit = new Retrofit.Builder()

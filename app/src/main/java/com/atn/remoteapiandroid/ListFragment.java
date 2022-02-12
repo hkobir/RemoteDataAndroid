@@ -19,7 +19,10 @@ import com.atn.remoteapiandroid.models.Photo;
 import com.atn.remoteapiandroid.remote.AlbumInterface;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,8 +47,9 @@ public class ListFragment extends Fragment {
         progressBar = view.findViewById(R.id.progressView);
         albumRv.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
         albumAdapter = new AlbumAdapter(requireContext());
-        populateAlbumData();
 
+        //populateAlbumData();
+        populateAlbumByQueryMap();
         return view;
     }
 
@@ -80,6 +84,38 @@ public class ListFragment extends Fragment {
             }
         });
 
+    }
+
+    //https://jsonplaceholder.typicode.com/albums/1/photos?albumId=1&_sort=id&_order=desc
+    private void populateAlbumByQueryMap() {
+        Map<String, String> albumMap = new HashMap<>();
+        albumMap.put("albumId", "5");
+        albumMap.put("_sort", "id");
+        albumMap.put("_order", "desc");
+        progressBar.setVisibility(View.VISIBLE);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        Call<List<Photo>> albumCall = retrofit.create(AlbumInterface.class)
+                .getAlbumsByQueryMap(albumMap);
+        albumCall.enqueue(new Callback<List<Photo>>() {
+            @Override
+            public void onResponse(Call<List<Photo>> call, Response<List<Photo>> response) {
+                if (response.isSuccessful()) {
+                    albumList = response.body();
+                    albumAdapter.setAlbumList(albumList);
+                    albumRv.setAdapter(albumAdapter);
+                    progressBar.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Photo>> call, Throwable t) {
+                Log.d("MainActivity", "onFailure: " + t.getMessage());
+            }
+        });
     }
 
 }
