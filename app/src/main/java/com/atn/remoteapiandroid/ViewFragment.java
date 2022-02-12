@@ -18,6 +18,8 @@ import android.widget.TextView;
 import com.atn.remoteapiandroid.models.Album;
 import com.atn.remoteapiandroid.remote.AlbumInterface;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -226,9 +228,18 @@ public class ViewFragment extends Fragment {
         titleEt = view.findViewById(R.id.urlEt);
         submitBtn = view.findViewById(R.id.submitBtn);
 
+        //added for logging remote api data into logcat and observe request and response
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(loggingInterceptor)
+                .build();
+
         retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
                 .build();
     }
 
