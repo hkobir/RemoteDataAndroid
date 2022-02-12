@@ -9,6 +9,9 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
+import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -45,8 +48,21 @@ public interface AlbumInterface {
 
 
     @POST("/albums")
-    Call<Album> insertAlbum(
+    Call<Album> insertAlbum(  //with model
             @Body Album album
+    );
+
+    @FormUrlEncoded
+    @POST("/albums")
+    Call<Album> insertAlbum( //custom field value with form
+            @Field("userId") int userId,
+            @Field("title") String title
+    );
+
+    @FormUrlEncoded
+    @POST("/albums")
+    Call<Album> insertAlbum( //with custom field by map
+            @FieldMap Map<String, String> fields
     );
 
     @PUT("/albums/{id}")
