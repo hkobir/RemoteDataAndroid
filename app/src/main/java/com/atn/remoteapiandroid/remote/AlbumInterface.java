@@ -13,6 +13,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -46,27 +47,37 @@ public interface AlbumInterface {
     @GET("/albums/{id}")
     Call<Album> getAlbumById(@Path("id") int id);
 
-
+    //with model
     @POST("/albums")
-    Call<Album> insertAlbum(  //with model
+    Call<Album> insertAlbum(
             @Body Album album
     );
 
+    //custom field value with form
     @FormUrlEncoded
     @POST("/albums")
-    Call<Album> insertAlbum( //custom field value with form
+    Call<Album> insertAlbum(
             @Field("userId") int userId,
             @Field("title") String title
     );
 
+    //with custom field by map
     @FormUrlEncoded
     @POST("/albums")
-    Call<Album> insertAlbum( //with custom field by map
+    Call<Album> insertAlbum(
             @FieldMap Map<String, String> fields
     );
 
+    //PUT annotation replace full object with new value, causes null parameter will saved with null
     @PUT("/albums/{id}")
     Call<Album> updateAlbum(
+            @Path("id") int id,
+            @Body Album album
+    );
+
+    //PATCH annotation not replace full object, just update new value and ignored null parameter, keep existing value
+    @PATCH("/albums/{id}")
+    Call<Album> patchAlbum(
             @Path("id") int id,
             @Body Album album
     );

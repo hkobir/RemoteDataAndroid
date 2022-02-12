@@ -116,7 +116,6 @@ public class ViewFragment extends Fragment {
     }
 
     private void insertAlbumData() {
-        showProgress(true);
         if (userIdEt.getText().toString().equals("")) {
             userIdEt.setError("user id required");
             return;
@@ -129,6 +128,7 @@ public class ViewFragment extends Fragment {
                 Integer.parseInt(userIdEt.getText().toString()),
                 titleEt.getText().toString()
         );
+        showProgress(true);
         Call<Album> albumCall = retrofit.create(AlbumInterface.class).insertAlbum(album);
         albumCall.enqueue(new Callback<Album>() {
             @Override
@@ -153,7 +153,6 @@ public class ViewFragment extends Fragment {
     }
 
     private void updateAlbumData() {
-        showProgress(true);
         if (userIdEt.getText().toString().equals("")) {
             userIdEt.setError("user id required");
             return;
@@ -166,6 +165,7 @@ public class ViewFragment extends Fragment {
                 Integer.parseInt(userIdEt.getText().toString()),
                 titleEt.getText().toString()
         );
+        showProgress(true);
         Call<Album> albumCall = retrofit.create(AlbumInterface.class).updateAlbum(5, album);
         albumCall.enqueue(new Callback<Album>() {
             @Override
