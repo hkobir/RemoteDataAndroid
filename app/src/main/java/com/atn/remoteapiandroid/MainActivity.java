@@ -30,14 +30,21 @@ public class MainActivity extends AppCompatActivity {
         alertDialog = new AlertDialog.Builder(MainActivity.this).create();
         alertDialog.setCancelable(true);
         View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.api_menu_dialog, null);
-        view.findViewById(R.id.listLayout).setOnClickListener(v -> replaceFragment(new ListFragment()));
-        view.findViewById(R.id.singleDataLV).setOnClickListener(v -> new ViewFragment());
+        view.findViewById(R.id.listLayout).setOnClickListener(v -> {
+            replaceFragment(new ListFragment());
+            alertDialog.dismiss();
+        });
+        view.findViewById(R.id.singleDataLV).setOnClickListener(v -> {
+            replaceFragment(new ViewFragment());
+            alertDialog.dismiss();
+        });
         view.findViewById(R.id.insertDataLV).setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putString("result", "insert");
             ViewFragment fragment = new ViewFragment();
             fragment.setArguments(bundle);
             replaceFragment(fragment);
+            alertDialog.dismiss();
         });
         view.findViewById(R.id.updateDataLV).setOnClickListener(v -> {
             Bundle bundle = new Bundle();
@@ -45,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
             ViewFragment fragment = new ViewFragment();
             fragment.setArguments(bundle);
             replaceFragment(fragment);
+            alertDialog.dismiss();
         });
         view.findViewById(R.id.deleteDataLV).setOnClickListener(v -> {
             Bundle bundle = new Bundle();
@@ -52,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
             ViewFragment fragment = new ViewFragment();
             fragment.setArguments(bundle);
             replaceFragment(fragment);
+            alertDialog.dismiss();
         });
         alertDialog.setCancelable(true);
         alertDialog.setView(view);

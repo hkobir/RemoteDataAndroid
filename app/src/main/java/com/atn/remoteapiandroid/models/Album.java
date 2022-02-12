@@ -14,6 +14,11 @@ public class Album {
     @Expose
     String title;
 
+    public Album(int userId, String title) {
+        this.userId = userId;
+        this.title = title;
+    }
+
     public int getUserId() {
         return userId;
     }

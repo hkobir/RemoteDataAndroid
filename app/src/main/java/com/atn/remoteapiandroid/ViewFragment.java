@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -29,7 +31,9 @@ public class ViewFragment extends Fragment {
     private ProgressBar progressBar;
     LinearLayout insertView, idView;
     Retrofit retrofit;
-    private TextView userId, dbId, title;
+    private EditText titleEt, urlEt;
+    Button submitBtn;
+    private TextView userId, dbId, title, tvResult;
     private String BASE_URL = "https://jsonplaceholder.typicode.com";
 
     @Override
@@ -46,10 +50,17 @@ public class ViewFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         loadArgument();
+        submitBtn.setOnClickListener(v -> {
+            if (isUpdate) {
+                updateAlbumData();
+            } else {
+                insertAlbumData();
+            }
+        });
     }
 
+
     private void loadArgument() {
-        showProgress(true);
         if (getArguments() != null) {
             result = getArguments().getString("result");
         }
@@ -57,11 +68,15 @@ public class ViewFragment extends Fragment {
             case "insert":
                 insertView.setVisibility(View.VISIBLE);
                 idView.setVisibility(View.GONE);
+                submitBtn.setText("Submit");
                 break;
             case "update":
                 isUpdate = true;
+                submitBtn.setText("Update");
+                getById(); //populate previous data
                 break;
             case "delete":
+                deleteAlbum();
                 break;
             default:
                 insertView.setVisibility(View.GONE);
@@ -71,21 +86,129 @@ public class ViewFragment extends Fragment {
     }
 
     private void getById() {
+        showProgress(true);
         Call<Album> albumCall = retrofit.create(AlbumInterface.class).getAlbumById(1);
         albumCall.enqueue(new Callback<Album>() {
             @Override
             public void onResponse(Call<Album> call, Response<Album> response) {
                 if (response.isSuccessful()) {
                     Album album = response.body();
-                    userId.setText(album.getUserId());
-                    dbId.setText(album.getId());
-                    title.setText(album.getTitle());
+                    if (isUpdate) {
+                        urlEt.setText(album.getTitle());
+                        titleEt.setText(String.valueOf(album.getUserId()));
+                    } else {
+                        tvResult.setText("Code: " + response.code());
+                        userId.setText("User id: "+ album.getUserId());
+                        dbId.setText("Id: "+ album.getId());
+                        title.setText("Title: "+album.getTitle());
+                    }
+                    showProgress(false);
+                } else {
+                    tvResult.setText("Code: " + response.code());
                 }
-                showProgress(false);
             }
 
             @Override
             public void onFailure(Call<Album> call, Throwable t) {
+                tvResult.setText(t.getMessage());
+                showProgress(false);
+            }
+        });
+    }
+
+    private void insertAlbumData() {
+        showProgress(true);
+        if (titleEt.getText().toString().equals("")) {
+            titleEt.setError("user id required");
+            return;
+        }
+        if (urlEt.getText().toString().equals("")) {
+            urlEt.setError("title required");
+            return;
+        }
+        Album album = new Album(
+                Integer.parseInt(titleEt.getText().toString()),
+                urlEt.getText().toString()
+        );
+        Call<Album> albumCall = retrofit.create(AlbumInterface.class).insertAlbum(album);
+        albumCall.enqueue(new Callback<Album>() {
+            @Override
+            public void onResponse(Call<Album> call, Response<Album> response) {
+                if (response.isSuccessful()) {
+                    tvResult.setText("Code: " + response.code() + "\n");
+                    tvResult.append("title: " + response.body().getTitle());
+                    tvResult.append("\nId: " + response.body().getId());
+                    tvResult.append("\nUser Id: " + response.body().getUserId());
+                    showProgress(false);
+                } else {
+                    tvResult.setText("Code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Album> call, Throwable t) {
+                tvResult.setText(t.getMessage());
+                showProgress(false);
+            }
+        });
+    }
+
+    private void updateAlbumData() {
+        showProgress(true);
+        if (titleEt.getText().toString().equals("")) {
+            titleEt.setError("user id required");
+            return;
+        }
+        if (urlEt.getText().toString().equals("")) {
+            urlEt.setError("title required");
+            return;
+        }
+        Album album = new Album(
+                Integer.parseInt(titleEt.getText().toString()),
+                urlEt.getText().toString()
+        );
+        Call<Album> albumCall = retrofit.create(AlbumInterface.class).updateAlbum(5, album);
+        albumCall.enqueue(new Callback<Album>() {
+            @Override
+            public void onResponse(Call<Album> call, Response<Album> response) {
+                if (response.isSuccessful()) {
+                    tvResult.setText("Code: " + response.code() + "\n");
+                    tvResult.append("title: " + response.body().getTitle());
+                    tvResult.append("\nId: " + response.body().getId());
+                    tvResult.append("\nUser Id: " + response.body().getUserId());
+                    showProgress(false);
+                } else {
+                    tvResult.setText("Code: " + response.code());
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<Album> call, Throwable t) {
+                tvResult.setText(t.getMessage());
+                showProgress(false);
+            }
+        });
+    }
+
+
+    private void deleteAlbum() {
+        showProgress(true);
+        Call<Album> albumCall = retrofit.create(AlbumInterface.class).deleteAlbum(5);
+        albumCall.enqueue(new Callback<Album>() {
+            @Override
+            public void onResponse(Call<Album> call, Response<Album> response) {
+                if (response.isSuccessful() && response.code() == 200) {
+                    tvResult.setText("Deleted success with id: 5");
+                    showProgress(false);
+                } else {
+                    tvResult.setText("Code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Album> call, Throwable t) {
+                tvResult.setText(t.getMessage());
                 showProgress(false);
             }
         });
@@ -99,6 +222,10 @@ public class ViewFragment extends Fragment {
         userId = view.findViewById(R.id.userId);
         dbId = view.findViewById(R.id.dbId);
         title = view.findViewById(R.id.titleTview);
+        tvResult = view.findViewById(R.id.textViewResult);
+        titleEt = view.findViewById(R.id.titleEt);
+        urlEt = view.findViewById(R.id.urlEt);
+        submitBtn = view.findViewById(R.id.submitBtn);
 
         retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
